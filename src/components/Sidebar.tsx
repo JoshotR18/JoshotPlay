@@ -46,13 +46,7 @@ const Sidebar = () => {
 
   return (
     <div className="h-full flex flex-col gap-2 p-2 bg-background">
-      <div className="p-4">
-        <Link to="/" className="flex items-center gap-2">
-          <img src="/logo.png" alt="JoshotPlay Logo" className="h-10 w-10" />
-          <h1 className="text-xl font-bold">JoshotPlay</h1>
-        </Link>
-      </div>
-      <div className="bg-muted rounded-lg p-2">
+      <div className="bg-muted rounded-lg p-2 mt-4">
         <nav className="flex flex-col gap-1">
           <Button variant="ghost" className="w-full justify-start text-lg" asChild>
             <Link to="/">
