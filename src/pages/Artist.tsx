@@ -12,7 +12,7 @@ const fetchArtistSongs = async (artistName: string): Promise<{ songs: Song[], ar
     .from('songs')
     .select('*')
     .eq('artist', artistName)
-    .order('created_at', { ascending: false });
+    .order('title', { ascending: true });
 
   if (error) {
     throw new Error(error.message);

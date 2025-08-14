@@ -15,7 +15,7 @@ const fetchSongs = async ({ pageParam }: { pageParam: unknown }): Promise<Song[]
   const { data, error } = await supabase
     .from('songs')
     .select('*')
-    .order('created_at', { ascending: false })
+    .order('title', { ascending: true })
     .range(rangeStart, rangeStart + PAGE_SIZE - 1);
 
   if (error) {

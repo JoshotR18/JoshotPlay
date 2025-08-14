@@ -17,6 +17,7 @@ const fetchSearchResults = async (query: string): Promise<SearchResults> => {
     .from('songs')
     .select('*')
     .or(`title.ilike.%${query}%,artist.ilike.%${query}%`)
+    .order('title', { ascending: true })
     .limit(20);
 
   const playlistQuery = supabase
