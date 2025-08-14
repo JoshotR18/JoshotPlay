@@ -16,7 +16,8 @@ const Login = () => {
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background to-slate-100 dark:from-background dark:to-slate-900">
       <div className="w-full max-w-md p-4">
         <Card>
-          <CardHeader>
+          <CardHeader className="items-center">
+            <img src="/logo.png" alt="JoshotPlay Logo" className="w-24 h-24 mb-4" />
             <CardTitle className="text-2xl text-center">Welcome to JoshotPlay</CardTitle>
           </CardHeader>
           <CardContent>
