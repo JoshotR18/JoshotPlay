@@ -6,6 +6,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { showSuccess, showError } from '@/utils/toast';
 import { Song } from '../types';
+import { useTranslation } from 'react-i18next';
 
 interface AddSongsToPlaylistDialogProps {
   playlistId: string;
@@ -19,6 +20,7 @@ const AddSongsToPlaylistDialog = ({ playlistId, open, onOpenChange, onSongsAdded
   const [selectedSongs, setSelectedSongs] = useState<Set<string>>(new Set());
   const [existingSongIds, setExistingSongIds] = useState<Set<string>>(new Set());
   const [loading, setLoading] = useState(false);
+  const { t } = useTranslation();
 
   useEffect(() => {
     if (open) {
@@ -58,7 +60,7 @@ const AddSongsToPlaylistDialog = ({ playlistId, open, onOpenChange, onSongsAdded
     if (songsToAdd.length > 0) {
       const { error } = await supabase.from('playlist_songs').insert(songsToAdd.map(song_id => ({ playlist_id: playlistId, song_id })));
       if (error) {
-        showError(`Failed to add songs: ${error.message}`);
+        showError(t('failed_to_add_songs', { message: error.message }));
         setLoading(false);
         return;
       }
@@ -67,13 +69,13 @@ const AddSongsToPlaylistDialog = ({ playlistId, open, onOpenChange, onSongsAdded
     if (songsToRemove.length > 0) {
       const { error } = await supabase.from('playlist_songs').delete().in('song_id', songsToRemove).eq('playlist_id', playlistId);
       if (error) {
-        showError(`Failed to remove songs: ${error.message}`);
+        showError(t('failed_to_remove_songs', { message: error.message }));
         setLoading(false);
         return;
       }
     }
     
-    showSuccess('Playlist updated successfully!');
+    showSuccess(t('playlist_updated_successfully'));
     onSongsAdded();
     onOpenChange(false);
     setLoading(false);
@@ -83,11 +85,11 @@ const AddSongsToPlaylistDialog = ({ playlistId, open, onOpenChange, onSongsAdded
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle>Add Songs to Playlist</DialogTitle>
+          <DialogTitle>{t('add_songs_to_playlist')}</DialogTitle>
         </DialogHeader>
         <ScrollArea className="h-72">
           <div className="space-y-4 p-4">
-            {loading ? <p>Loading songs...</p> : allSongs.map(song => (
+            {loading ? <p>{t('loading_songs')}</p> : allSongs.map(song => (
               <div key={song.id} className="flex items-center space-x-2">
                 <Checkbox
                   id={song.id}
@@ -103,7 +105,7 @@ const AddSongsToPlaylistDialog = ({ playlistId, open, onOpenChange, onSongsAdded
         </ScrollArea>
         <DialogFooter>
           <Button onClick={handleSaveChanges} disabled={loading}>
-            {loading ? 'Saving...' : 'Save Changes'}
+            {loading ? t('saving') : t('save_changes')}
           </Button>
         </DialogFooter>
       </DialogContent>

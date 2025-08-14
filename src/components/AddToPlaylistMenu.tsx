@@ -8,6 +8,7 @@ import { Button } from './ui/button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuLabel, DropdownMenuSeparator } from './ui/dropdown-menu';
 import { Plus, Loader2 } from 'lucide-react';
 import { showSuccess, showError } from '@/utils/toast';
+import { useTranslation } from 'react-i18next';
 
 interface AddToPlaylistMenuProps {
   song: Song;
@@ -25,6 +26,7 @@ const fetchUserPlaylists = async (userId: string): Promise<Playlist[]> => {
 const AddToPlaylistMenu = ({ song }: AddToPlaylistMenuProps) => {
   const { user } = useAuth();
   const [isAdding, setIsAdding] = useState(false);
+  const { t } = useTranslation();
 
   const { data: playlists, isLoading } = useQuery<Playlist[], Error>({
     queryKey: ['user-playlists', user?.id],
@@ -49,15 +51,15 @@ const AddToPlaylistMenu = ({ song }: AddToPlaylistMenuProps) => {
 
       if (error) {
         if (error.code === '23505') { // Unique constraint violation
-          showError(`"${song.title}" is already in this playlist.`);
+          showError(t('song_already_in_playlist', { title: song.title }));
         } else {
           throw error;
         }
       } else {
-        showSuccess(`Added "${song.title}" to the playlist!`);
+        showSuccess(t('song_added_to_playlist', { title: song.title }));
       }
     } catch (error: any) {
-      showError(error.message || 'Failed to add song.');
+      showError(error.message || t('failed_to_add_song'));
     } finally {
       setIsAdding(false);
     }
@@ -89,7 +91,7 @@ const AddToPlaylistMenu = ({ song }: AddToPlaylistMenuProps) => {
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent>
-        <DropdownMenuLabel>Add to playlist</DropdownMenuLabel>
+        <DropdownMenuLabel>{t('add_to_playlist')}</DropdownMenuLabel>
         <DropdownMenuSeparator />
         {playlists && playlists.length > 0 ? (
           playlists.map((playlist) => (
@@ -99,7 +101,7 @@ const AddToPlaylistMenu = ({ song }: AddToPlaylistMenuProps) => {
           ))
         ) : (
           <DropdownMenuItem asChild>
-            <Link to="/create-playlist">Create a new playlist</Link>
+            <Link to="/create-playlist">{t('create_new_playlist_link')}</Link>
           </DropdownMenuItem>
         )}
       </DropdownMenuContent>

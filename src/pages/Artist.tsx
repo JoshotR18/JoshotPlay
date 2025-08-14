@@ -5,6 +5,7 @@ import { Song } from '@/types';
 import SongRow from '@/components/SongRow';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
+import { useTranslation } from 'react-i18next';
 
 const fetchArtistSongs = async (artistName: string): Promise<{ songs: Song[], artistCover: string | null }> => {
   const { data, error } = await supabase
@@ -25,6 +26,7 @@ const fetchArtistSongs = async (artistName: string): Promise<{ songs: Song[], ar
 const ArtistPage = () => {
   const { artistName } = useParams<{ artistName: string }>();
   const decodedArtistName = decodeURIComponent(artistName || '');
+  const { t } = useTranslation();
 
   const { data, isLoading, error } = useQuery<{ songs: Song[], artistCover: string | null }, Error>({
     queryKey: ['artist', decodedArtistName],
@@ -64,7 +66,7 @@ const ArtistPage = () => {
   }
 
   if (error) {
-    return <p className="text-destructive">Error: {error.message}</p>;
+    return <p className="text-destructive">{t('error_prefix', { message: error.message })}</p>;
   }
 
   return (
@@ -76,14 +78,14 @@ const ArtistPage = () => {
           className="h-32 w-32 rounded-lg object-cover shadow-lg"
         />
         <div>
-          <p className="text-sm font-bold uppercase">Artist</p>
+          <p className="text-sm font-bold uppercase">{t('artist')}</p>
           <h1 className="text-5xl font-bold">{decodedArtistName}</h1>
         </div>
       </div>
       
       <Card>
         <CardHeader>
-          <CardTitle>Top Songs</CardTitle>
+          <CardTitle>{t('top_songs')}</CardTitle>
         </CardHeader>
         <CardContent className="p-2">
           <div className="space-y-1">
@@ -92,7 +94,7 @@ const ArtistPage = () => {
                 <SongRow key={song.id} song={song} allSongs={allSongs} index={index} />
               ))
             ) : (
-              <p className="text-center text-muted-foreground p-4">No songs found for this artist.</p>
+              <p className="text-center text-muted-foreground p-4">{t('no_songs_for_artist')}</p>
             )}
           </div>
         </CardContent>

@@ -5,6 +5,7 @@ import { Song, Playlist } from '@/types';
 import SongRow from '@/components/SongRow';
 import PlaylistCard from '@/components/PlaylistCard';
 import { Skeleton } from '@/components/ui/skeleton';
+import { useTranslation } from 'react-i18next';
 
 interface SearchResults {
   songs: Song[];
@@ -38,6 +39,7 @@ const fetchSearchResults = async (query: string): Promise<SearchResults> => {
 const SearchPage = () => {
   const [searchParams] = useSearchParams();
   const query = searchParams.get('q') || '';
+  const { t } = useTranslation();
 
   const { data, isLoading, error } = useQuery<SearchResults, Error>({
     queryKey: ['search', query],
@@ -46,12 +48,12 @@ const SearchPage = () => {
   });
 
   if (!query) {
-    return <div className="text-center text-muted-foreground">Please enter a search term to begin.</div>;
+    return <div className="text-center text-muted-foreground">{t('search_begin')}</div>;
   }
 
   return (
     <div>
-      <h1 className="text-3xl font-bold mb-4">Search Results for "{query}"</h1>
+      <h1 className="text-3xl font-bold mb-4">{t('search_results_for', { query })}</h1>
       
       {isLoading ? (
         <div className="space-y-8">
@@ -69,12 +71,12 @@ const SearchPage = () => {
           </div>
         </div>
       ) : error ? (
-        <p className="text-destructive">Error: {error.message}</p>
+        <p className="text-destructive">{t('error_prefix', { message: error.message })}</p>
       ) : (
         <div className="space-y-8">
           {data?.playlists && data.playlists.length > 0 && (
             <div>
-              <h2 className="text-2xl font-semibold mb-4">Playlists</h2>
+              <h2 className="text-2xl font-semibold mb-4">{t('playlists')}</h2>
               <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
                 {data.playlists.map(playlist => (
                   <PlaylistCard key={playlist.id} playlist={playlist} />
@@ -85,7 +87,7 @@ const SearchPage = () => {
 
           {data?.songs && data.songs.length > 0 && (
             <div>
-              <h2 className="text-2xl font-semibold mb-4">Songs</h2>
+              <h2 className="text-2xl font-semibold mb-4">{t('songs')}</h2>
               <div className="space-y-1">
                 {data.songs.map((song, index) => (
                   <SongRow key={song.id} song={song} allSongs={data.songs} index={index} />
@@ -95,7 +97,7 @@ const SearchPage = () => {
           )}
 
           {data?.playlists?.length === 0 && data?.songs?.length === 0 && (
-            <p className="text-center text-muted-foreground mt-8">No results found for "{query}".</p>
+            <p className="text-center text-muted-foreground mt-8">{t('no_search_results', { query })}</p>
           )}
         </div>
       )}

@@ -11,6 +11,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '
 import { useAuth } from '@/contexts/AuthContext';
 import { showLoading, showSuccess, showError, dismissToast } from '@/utils/toast';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 
 const formSchema = z.object({
   name: z.string().min(1, 'Playlist name is required'),
@@ -21,6 +22,7 @@ const CreatePlaylistPage = () => {
   const { user } = useAuth();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const navigate = useNavigate();
+  const { t } = useTranslation();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -32,12 +34,12 @@ const CreatePlaylistPage = () => {
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     if (!user) {
-      showError('You must be logged in to create a playlist.');
+      showError(t('must_be_logged_in_create_playlist'));
       return;
     }
 
     setIsSubmitting(true);
-    const toastId = showLoading('Creating playlist...');
+    const toastId = showLoading(t('creating_playlist'));
 
     try {
       const { data: playlistData, error: insertError } = await supabase.from('playlists').insert({
@@ -49,11 +51,11 @@ const CreatePlaylistPage = () => {
       if (insertError) throw insertError;
 
       dismissToast(toastId);
-      showSuccess('Playlist created successfully!');
+      showSuccess(t('playlist_created_successfully'));
       navigate(`/playlist/${playlistData.id}`);
     } catch (error: any) {
       dismissToast(toastId);
-      showError(error.message || 'Failed to create playlist.');
+      showError(error.message || t('failed_to_create_playlist'));
       console.error(error);
     } finally {
       setIsSubmitting(false);
@@ -63,7 +65,7 @@ const CreatePlaylistPage = () => {
   return (
     <Card className="max-w-2xl mx-auto">
       <CardHeader>
-        <CardTitle>Create New Playlist</CardTitle>
+        <CardTitle>{t('create_new_playlist')}</CardTitle>
       </CardHeader>
       <CardContent>
         <Form {...form}>
@@ -73,9 +75,9 @@ const CreatePlaylistPage = () => {
               name="name"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Playlist Name</FormLabel>
+                  <FormLabel>{t('playlist_name')}</FormLabel>
                   <FormControl>
-                    <Input placeholder="My Awesome Playlist" {...field} />
+                    <Input placeholder={t('playlist_name_placeholder')} {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -86,16 +88,16 @@ const CreatePlaylistPage = () => {
               name="description"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Description (Optional)</FormLabel>
+                  <FormLabel>{t('description_optional')}</FormLabel>
                   <FormControl>
-                    <Textarea placeholder="A short description of your playlist" {...field} />
+                    <Textarea placeholder={t('description_placeholder')} {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
             />
             <Button type="submit" disabled={isSubmitting}>
-              {isSubmitting ? 'Creating...' : 'Create Playlist'}
+              {isSubmitting ? t('creating') : t('create_playlist')}
             </Button>
           </form>
         </Form>

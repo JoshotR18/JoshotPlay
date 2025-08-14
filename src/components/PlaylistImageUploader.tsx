@@ -9,6 +9,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogD
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { showLoading, showSuccess, showError, dismissToast } from '@/utils/toast';
 import { getPathFromUrl } from '@/lib/utils';
+import { useTranslation } from 'react-i18next';
 
 interface PlaylistImageUploaderProps {
   playlistId: string;
@@ -24,13 +25,14 @@ const formSchema = z.object({
 
 const PlaylistImageUploader = ({ playlistId, currentCoverUrl, open, onOpenChange, onImageUploaded }: PlaylistImageUploaderProps) => {
   const [isUploading, setIsUploading] = useState(false);
+  const { t } = useTranslation();
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
   });
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     setIsUploading(true);
-    const toastId = showLoading('Uploading new cover...');
+    const toastId = showLoading(t('uploading_cover'));
 
     try {
       // 1. Upload new image
@@ -58,13 +60,13 @@ const PlaylistImageUploader = ({ playlistId, currentCoverUrl, open, onOpenChange
       }
 
       dismissToast(toastId);
-      showSuccess('Playlist cover updated!');
+      showSuccess(t('playlist_cover_updated'));
       onImageUploaded();
       onOpenChange(false);
       form.reset();
     } catch (error: any) {
       dismissToast(toastId);
-      showError(error.message || 'Failed to upload cover.');
+      showError(error.message || t('failed_to_upload_cover'));
     } finally {
       setIsUploading(false);
     }
@@ -74,8 +76,8 @@ const PlaylistImageUploader = ({ playlistId, currentCoverUrl, open, onOpenChange
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Change Playlist Cover</DialogTitle>
-          <DialogDescription>Select a new image for your playlist.</DialogDescription>
+          <DialogTitle>{t('change_playlist_cover')}</DialogTitle>
+          <DialogDescription>{t('change_playlist_cover_desc')}</DialogDescription>
         </DialogHeader>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
@@ -84,7 +86,7 @@ const PlaylistImageUploader = ({ playlistId, currentCoverUrl, open, onOpenChange
               name="coverArtFile"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Cover Image</FormLabel>
+                  <FormLabel>{t('cover_image')}</FormLabel>
                   <FormControl>
                     <Input
                       type="file"
@@ -97,9 +99,9 @@ const PlaylistImageUploader = ({ playlistId, currentCoverUrl, open, onOpenChange
               )}
             />
             <DialogFooter>
-              <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>Cancel</Button>
+              <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>{t('cancel')}</Button>
               <Button type="submit" disabled={isUploading}>
-                {isUploading ? 'Uploading...' : 'Upload'}
+                {isUploading ? t('uploading') : t('upload')}
               </Button>
             </DialogFooter>
           </form>

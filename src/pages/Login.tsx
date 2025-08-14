@@ -4,9 +4,11 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { Navigate } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { useTranslation } from 'react-i18next';
 
 const Login = () => {
   const { session } = useAuth();
+  const { t } = useTranslation();
 
   if (session) {
     return <Navigate to="/" />;
@@ -18,7 +20,7 @@ const Login = () => {
         <Card>
           <CardHeader className="items-center">
             <img src="/logo.png" alt="JoshotPlay Logo" className="w-24 h-24 mb-4" />
-            <CardTitle className="text-2xl text-center">Welcome to JoshotPlay</CardTitle>
+            <CardTitle className="text-2xl text-center">{t('welcome_to_joshotplay')}</CardTitle>
           </CardHeader>
           <CardContent>
             <Auth

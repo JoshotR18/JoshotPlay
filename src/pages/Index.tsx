@@ -87,7 +87,7 @@ const Index = () => {
                 </div>
               ))
             ) : error ? (
-              <p className="text-destructive p-4 text-center">Error: {error.message}</p>
+              <p className="text-destructive p-4 text-center">{t('error_prefix', { message: error.message })}</p>
             ) : allSongs.length > 0 ? (
               allSongs.map((song, index) => (
                 <SongRow key={song.id} song={song} allSongs={allSongs} index={index} />
