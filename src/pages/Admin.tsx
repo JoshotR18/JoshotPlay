@@ -8,7 +8,7 @@ import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { useAuth } from '@/contexts/AuthContext';
-import { showLoading, showSuccess, showError, dismissToast } from '@/utils/toast';
+import { showLoading, showSuccess, showError, dismissToast, showInfo } from '@/utils/toast';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import ManageSongsTab from '../components/admin/ManageSongsTab';
 import { useQueryClient } from '@tanstack/react-query';
@@ -63,15 +63,54 @@ const AddSongForm = () => {
         };
       });
 
-      const songsToInsert = await Promise.all(uploadPromises);
+      const songsToPotentiallyInsert = await Promise.all(uploadPromises);
 
-      if (songsToInsert.length > 0) {
-        const { error: insertError } = await supabase.from('songs').insert(songsToInsert);
+      if (songsToPotentiallyInsert.length === 0) {
+        dismissToast(toastId);
+        return;
+      }
+
+      // Check for duplicates before inserting
+      const filter = songsToPotentiallyInsert
+        .map(song => `and(title.eq.${song.title},artist.eq.${song.artist || 'null'})`)
+        .join(',');
+      
+      const { data: existingSongs, error: checkError } = await supabase
+        .from('songs')
+        .select('title, artist')
+        .or(filter);
+
+      if (checkError) throw checkError;
+
+      const existingSet = new Set(
+        existingSongs.map(s => `${s.title}|${s.artist || 'null'}`)
+      );
+
+      const newSongsToInsert = songsToPotentiallyInsert.filter(
+        song => !existingSet.has(`${song.title}|${song.artist || 'null'}`)
+      );
+
+      const skippedCount = songsToPotentiallyInsert.length - newSongsToInsert.length;
+
+      // Insert only the new songs
+      if (newSongsToInsert.length > 0) {
+        const { error: insertError } = await supabase.from('songs').insert(newSongsToInsert);
         if (insertError) throw insertError;
       }
 
       dismissToast(toastId);
-      showSuccess(t('songs_added_successfully', { count: songsToInsert.length }));
+      
+      if (newSongsToInsert.length > 0) {
+        showSuccess(t('songs_added_successfully', { count: newSongsToInsert.length }));
+      }
+      if (skippedCount > 0) {
+        if (newSongsToInsert.length === 0) {
+          showSuccess(t('all_songs_were_duplicates'));
+        } else {
+          showInfo(t('songs_skipped_duplicates', { count: skippedCount }));
+        }
+      }
+
       form.reset();
       queryClient.invalidateQueries({ queryKey: ['all-songs'] });
     } catch (error: any) {
