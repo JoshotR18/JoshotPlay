@@ -5,7 +5,7 @@ import { Song, Playlist } from '../types';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
-import { PlusCircle, Music, Pencil, GripVertical, Trash2, MoreVertical, Play } from 'lucide-react';
+import { PlusCircle, Pencil, GripVertical, Trash2, MoreVertical, Play } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import AddSongsToPlaylistDialog from '@/components/AddSongsToPlaylistDialog';
 import { useMusicPlayer } from '@/contexts/MusicPlayerContext';
@@ -211,57 +211,44 @@ const PlaylistPage = () => {
 
   return (
     <>
-      <div className="md:flex md:gap-8">
-        <div className="relative w-48 h-48 md:w-64 md:h-64 rounded-lg shadow-lg bg-muted flex items-center justify-center group shrink-0">
-          {playlist.cover_art_url ? (
-            <img src={playlist.cover_art_url} alt={playlist.name} className="w-full h-full object-cover rounded-lg" />
-          ) : (
-            <Music className="w-24 h-24 text-muted-foreground" />
-          )}
-          {isOwner && (
-            <button onClick={() => setIsImageUploadOpen(true)} className="absolute inset-0 bg-black/50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity rounded-lg z-10 cursor-pointer">
-              <Pencil className="w-12 h-12 text-white" />
-              <span className="sr-only">{t('change_cover')}</span>
-            </button>
-          )}
+      <div className="flex flex-col md:flex-row justify-between md:items-center mb-6 gap-4">
+        <div>
+          <p className="text-sm font-bold uppercase text-muted-foreground">{t('playlist')}</p>
+          <h1 className="text-3xl font-bold">{playlist.name}</h1>
+          <p className="text-muted-foreground mt-1">{playlist.description}</p>
         </div>
-        <div className="mt-4 md:mt-0 flex flex-col justify-end">
-          <p className="text-sm font-bold uppercase">{t('playlist')}</p>
-          <h1 className="text-4xl md:text-6xl font-bold">{playlist.name}</h1>
-          <p className="text-lg text-muted-foreground mt-2">{playlist.description}</p>
-          {isOwner && (
-            <div className="flex items-center gap-4 mt-4">
-              <Button onClick={() => playPlaylist(songs, 0)} disabled={songs.length === 0}>
-                <Play className="mr-2 h-4 w-4" /> {t('play')}
-              </Button>
-              <Button variant="outline" onClick={() => setIsAddSongDialogOpen(true)}>
-                <PlusCircle className="mr-2 h-4 w-4" /> {t('add_songs')}
-              </Button>
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" size="icon">
-                    <MoreVertical className="h-5 w-5" />
-                    <span className="sr-only">{t('more_options')}</span>
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end">
-                  <DropdownMenuItem onClick={() => setIsImageUploadOpen(true)}>
-                    <Pencil className="mr-2 h-4 w-4" />
-                    {t('change_cover')}
-                  </DropdownMenuItem>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem onClick={() => setIsDeleteDialogOpen(true)} className="text-destructive focus:text-destructive focus:bg-destructive/10">
-                    <Trash2 className="mr-2 h-4 w-4" />
-                    {t('delete_playlist')}
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-            </div>
-          )}
-        </div>
+        {isOwner && (
+          <div className="flex items-center gap-2 shrink-0">
+            <Button onClick={() => playPlaylist(songs, 0)} disabled={songs.length === 0}>
+              <Play className="mr-2 h-4 w-4" /> {t('play')}
+            </Button>
+            <Button variant="outline" onClick={() => setIsAddSongDialogOpen(true)}>
+              <PlusCircle className="mr-2 h-4 w-4" /> {t('add_songs')}
+            </Button>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" size="icon">
+                  <MoreVertical className="h-5 w-5" />
+                  <span className="sr-only">{t('more_options')}</span>
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuItem onClick={() => setIsImageUploadOpen(true)}>
+                  <Pencil className="mr-2 h-4 w-4" />
+                  {t('change_cover')}
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={() => setIsDeleteDialogOpen(true)} className="text-destructive focus:text-destructive focus:bg-destructive/10">
+                  <Trash2 className="mr-2 h-4 w-4" />
+                  {t('delete_playlist')}
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
+        )}
       </div>
 
-      <Card className="mt-8">
+      <Card>
         <CardContent className="p-2">
           <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
             <SortableContext items={songs.map(s => s.id)} strategy={verticalListSortingStrategy}>
